@@ -1,95 +1,49 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import React, { useState, useEffect } from 'react';
 
-export default function Home() {
+const generateId = () => Date.now() + Math.random().toString(36).substr(2, 9);
+
+const Page = () => {
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isHovering, setIsHovering] = useState(null);
+
+  const fetchImage = async () => {
+    setLoading(true);
+    try {
+      const imageUrl = `https://picsum.photos/300/400?random=${generateId()}`;
+      setImages(prev => [...prev, { url: imageUrl, id: generateId() }]);
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="container">
+      <button onClick={fetchImage} className='btn' disabled={loading}>
+        {loading ? 'Loading...' : 'Get Image'}
+      </button>
+      
+      <div className='imgs'>
+        {images.map((image) => (
+          <div 
+            key={image.id}
+            className="img-container"
+            onMouseEnter={() => setIsHovering(image.id)}
+            onMouseLeave={() => setIsHovering(null)}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <img
+              src={image.url}
+              alt="Random from picsum"
+              className="image-item"
             />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default Page;
